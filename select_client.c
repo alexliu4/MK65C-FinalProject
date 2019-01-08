@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv) {
 
+  char **chatroom = (char **)calloc(5, 5);
   int server_socket;
   char buffer[BUFFER_SIZE];
 
