@@ -24,7 +24,6 @@ void subserver(int client_socket) {
   char buffer[BUFFER_SIZE];
 
   while (read(client_socket, buffer, sizeof(buffer))) {
-    printf("THERE IS NOTHING: %s NOTHING", chatrooms[0]);
 
     printf("[subserver %d] received: [%s]\n", getpid(), buffer);
     process(buffer);
