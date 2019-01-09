@@ -22,6 +22,8 @@ int main() {
 
 void subserver(int client_socket) {
   char buffer[BUFFER_SIZE];
+  read(client_socket, buffer, sizeof(buffer));
+  printf("subserver %d wants to connect to chatroom: %s", getpid(), buffer);
 
   while (read(client_socket, buffer, sizeof(buffer))) {
 
