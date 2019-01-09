@@ -5,11 +5,12 @@ void subserver(int from_client);
 int is_full(int * chatroom);
 int next_slot(int * chatroom);
 int add_client(int * chatroom, int slot);
+int num_from_string(char s);
 
 int main() {
-  int ** chatrooms = malloc(3 * sizeof(int*));
+  int ** chatrooms = malloc(NUM_CHATROOMS * sizeof(int*));
   for (int i = 0; i < 3; i++){
-    chatrooms[i] = malloc(3 * sizeof(int));
+    chatrooms[i] = malloc(NUM_USERS * sizeof(int));
    /* 
     for (int j = 0; j < 3; j++){
        chatrooms[i][j] = 30000;
@@ -34,8 +35,14 @@ int main() {
 
 void subserver(int client_socket) {
   char buffer[BUFFER_SIZE];
+
+  //code to add to chatroom
   read(client_socket, buffer, sizeof(buffer));
   printf("subserver %d wants to connect to chatroom: %s", getpid(), buffer);
+  int chatroom_id = num_from_string(*buffer);
+  sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+  printf("info in buffer: %s", buffer);
+  write(client_socket, buffer, sizeof(buffer));
 
   while (read(client_socket, buffer, sizeof(buffer))) {
     printf("[subserver %d] received: [%s]\n", getpid(), buffer);
@@ -56,3 +63,7 @@ void process(char * s) {
   }
 }
 
+int num_from_string(char s){
+  int num = s - '0';
+  return num;
+}

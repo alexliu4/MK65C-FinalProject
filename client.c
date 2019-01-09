@@ -1,6 +1,7 @@
 #include "networking.h"
 
-int numbers_only(char * s);
+int valid_num(char * s);
+int num_from_string(char s);
 
 int main(int argc, char **argv) {
 
@@ -16,14 +17,14 @@ int main(int argc, char **argv) {
   printf("Please enter a valid chatroom id (0, 1, 2): ");
   fgets(buffer, sizeof(buffer), stdin);
 
-  while (!numbers_only(buffer)){
+  while (!valid_num(buffer) || strlen(buffer)>2){
     printf("Please enter a valid chatroom id (0, 1, 2): ");
     fgets(buffer, sizeof(buffer), stdin);
   }
 
   write(server_socket, buffer, sizeof(buffer));
-  //read(server_socket, buffer, sizeof(buffer));
-  printf("you have joined chatroom %s", buffer);
+  read(server_socket, buffer, sizeof(buffer));
+  printf("%s", buffer);
 
   while (1) {
     printf("enter data: ");
@@ -34,13 +35,17 @@ int main(int argc, char **argv) {
     printf("received: [%s]\n", buffer);
   }
 }
-int numbers_only(char * s){
-  while(*s!='\n'){
-    printf("char: %d\n", *s);
-    if(isdigit(*s++)==0){
-      return 0;
-    }
+int valid_num(char * s){
+  if(isdigit(*s)==0){
+    return 0;
+  }
+  if(num_from_string(*s)>=NUM_CHATROOMS){
+    return 0;
   }
   return 1;
 }
 
+int num_from_string(char s){
+  int num = s - '0';
+  return num;
+}
