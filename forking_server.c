@@ -5,7 +5,6 @@ void subserver(int from_client);
 int is_full(int * chatroom);
 int next_slot(int * chatroom);
 int add_client(int * chatroom, int slot);
-int numbers_only(char * s);
 
 int main() {
   int ** chatrooms = malloc(3 * sizeof(int*));
@@ -39,7 +38,6 @@ void subserver(int client_socket) {
   printf("subserver %d wants to connect to chatroom: %s", getpid(), buffer);
 
   while (read(client_socket, buffer, sizeof(buffer))) {
-
     printf("[subserver %d] received: [%s]\n", getpid(), buffer);
     process(buffer);
     write(client_socket, buffer, sizeof(buffer));
@@ -57,5 +55,4 @@ void process(char * s) {
     s++;
   }
 }
-
 
