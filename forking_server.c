@@ -39,7 +39,10 @@ void subserver(int client_socket) {
   //code to add to chatroom
   read(client_socket, buffer, sizeof(buffer));
   printf("subserver %d wants to connect to chatroom: %s", getpid(), buffer);
+  
   int chatroom_id = num_from_string(*buffer);
+  //chatrooms[chatroom_id][next_slot(chatrooms[chatroom_id])] = getpid();
+  
   sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
   printf("info in buffer: %s", buffer);
   write(client_socket, buffer, sizeof(buffer));
@@ -66,4 +69,12 @@ void process(char * s) {
 int num_from_string(char s){
   int num = s - '0';
   return num;
+}
+
+int next_slot(int * chatroom){
+  int slot = 0;
+  while(slot < NUM_USERS && slot){
+    slot++;
+  }
+  return slot;
 }
