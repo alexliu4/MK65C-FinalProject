@@ -93,15 +93,5 @@ int num_from_string(char s){
   return num;
 }
 
-int add_client(int chatroom, int * chatrooms){
-  int slot = chatroom;
-  printf("chatroom: %d\n", chatroom);
-  int col = 1;
-  while(chatrooms[slot] && slot<NUM_CHATROOMS*NUM_USERS){
-    slot = col*NUM_CHATROOMS + chatroom;
-    col++;
-  }
-  printf("slot: %d\n", slot);
-  chatrooms[slot] = getpid();
-  return slot;
-}
+
+
