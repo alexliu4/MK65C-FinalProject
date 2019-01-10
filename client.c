@@ -2,6 +2,8 @@
 
 int valid_num(char * s);
 int num_from_string(char s);
+int add_chat(int * my_chats, int chat);
+
 
 int main(int argc, char **argv) {
 
@@ -22,6 +24,12 @@ int main(int argc, char **argv) {
     fgets(buffer, sizeof(buffer), stdin);
   }
 
+  int * my_chats = malloc(NUM_CHATROOMS);
+  add_chat(my_chats, num_from_string(*buffer));
+  for(int i = 0; i < NUM_CHATROOMS; i++){
+    printf("%d ", my_chats[i]);
+  }
+
   write(server_socket, buffer, sizeof(buffer));
   read(server_socket, buffer, sizeof(buffer));
   printf("%s", buffer);
@@ -35,6 +43,18 @@ int main(int argc, char **argv) {
     printf("received: [%s]\n", buffer);
   }
 }
+
+int add_chat(int * my_chats, int chat){
+  int slot = 0;
+  printf("chatroom: %d\n", slot);
+  while(my_chats[slot] && slot<NUM_CHATROOMS){
+    slot++;
+  }
+  printf("slot: %d\n", slot);
+  my_chats[slot] = chat;
+  return chat;
+}
+
 int valid_num(char * s){
   if(isdigit(*s)==0){
     return 0;
