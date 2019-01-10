@@ -9,6 +9,8 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
 #ifndef NETWORKING_H
 #define NETWORKING_H
@@ -23,8 +25,5 @@ void error_check(int i, char *s);
 int server_setup();
 int server_connect(int sd);
 int client_setup(char * server);
-
-extern char ** chatrooms;
-
 
 #endif
