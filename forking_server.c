@@ -3,8 +3,7 @@
 void process(char *s);
 void subserver(int from_client, int * chatrooms);
 int is_full(int * chatroom);
-int next_slot(int chatroom, int * chatrooms);
-int add_client(int * chatroom, int slot);
+int add_client(int chatroom_id, int * chatrooms);
 int num_from_string(char s);
 
 int main() {
@@ -21,9 +20,10 @@ int main() {
   if(chatrooms == (void*) -1){
     perror("shmat");
   }
-
+  
+  //reset chatrooms
   for (int i=0; i<NUM_CHATROOMS*NUM_USERS; i++){
-      	//chatrooms[i] = 0;
+      	chatrooms[i] = 0;
 	printf("%d ", chatrooms[i]);
   }
 
@@ -56,9 +56,9 @@ void subserver(int client_socket, int * chatrooms) {
   
   int chatroom_id = num_from_string(*buffer);
   printf("chatroom_id: %d\n", chatroom_id);
-  int pid = getpid();
-  printf("pid: %d\n", getpid());
-  chatrooms[next_slot(chatroom_id, chatrooms)] = getpid();
+
+  add_client(chatroom_id, chatrooms);
+ 
     for (int i=0; i<NUM_CHATROOMS*NUM_USERS; i++){
         printf("%d ", chatrooms[i]);
   }
@@ -72,8 +72,9 @@ void subserver(int client_socket, int * chatrooms) {
     process(buffer);
     write(client_socket, buffer, sizeof(buffer));
   }//end read loop
-  close(client_socket);
+  
   shmdt(chatrooms);
+  close(client_socket);
   exit(0);
 }
 
@@ -92,7 +93,7 @@ int num_from_string(char s){
   return num;
 }
 
-int next_slot(int chatroom, int * chatrooms){
+int add_client(int chatroom, int * chatrooms){
   int slot = chatroom;
   printf("chatroom: %d\n", chatroom);
   int col = 1;
@@ -101,5 +102,7 @@ int next_slot(int chatroom, int * chatrooms){
     col++;
   }
   printf("slot: %d\n", slot);
+  chatrooms[slot] = getpid();
   return slot;
 }
+

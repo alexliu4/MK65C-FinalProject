@@ -9,6 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <signal.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
