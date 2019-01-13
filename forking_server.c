@@ -104,6 +104,10 @@ void subserver(int client_socket, int * chatrooms) {
   exit(0);
 }
 
+void checker(int pid, int chatName, int * chatrooms){
+
+}
+
 void process(char * s) {
   while (*s) {
     if (*s >= 'a' && *s <= 'z')
@@ -122,10 +126,17 @@ int num_from_string(char s){
 int add_client(int chatroom, int * chatrooms){
   int slot = chatroom;
   printf("chatroom: %d\n", chatroom);
-  int col = 1;
-  while(chatrooms[slot] && slot<NUM_CHATROOMS*NUM_USERS){
-    slot = col*NUM_CHATROOMS + chatroom;
-    col++;
+  // // chatroom format 0 1 2 0 1 2 0 1 2
+  // int col = 1;
+  // while(chatrooms[slot] && slot< NUM_CHATROOMS * NUM_USERS){
+  //   slot = col * NUM_CHATROOMS + chatroom;
+  //   col++;
+  // }
+  // chatroom format 0 0 0 1 1 1 2 2 2
+  printf("%d\n", NUM_USERS);
+  slot = chatroom * NUM_USERS;
+  while(chatrooms[slot]){
+    slot++;
   }
   printf("slot: %d\n", slot);
   chatrooms[slot] = getpid();
