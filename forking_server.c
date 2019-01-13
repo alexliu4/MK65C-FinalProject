@@ -57,37 +57,46 @@ void subserver(int client_socket, int * chatrooms) {
   int chatroom_id = num_from_string(*buffer);
   printf("chatroom_id: %d\n", chatroom_id);
 
+  // adds client to chat
   add_client(chatroom_id, chatrooms);
-
+  // adds client to servers list of clients in chats
   for (int i=0; i<NUM_CHATROOMS*NUM_USERS; i++){
       printf("%d ", chatrooms[i]);
   }
-
+  // message to client
   sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
   printf("info in buffer: %s", buffer);
   write(client_socket, buffer, sizeof(buffer));
 
+  // reads the messages and checks for join keyword
   while (read(client_socket, buffer, sizeof(buffer))) {
     printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-    // if (! strncmp("join", buffer, 4) ){
-    //   printf("NEEDS TO JOIN A NEW SERVER!!!");
-    //   chdir(buffer + 4);
-    //   read(client_socket, buffer, sizeof(buffer));
-    //   printf("subserver %d wants to connect to chatroom: %s", getpid(), buffer);
-    //   int chatroom_id = num_from_string(*buffer);
-    //   printf("chatroom_id: %d\n", chatroom_id);
-    //
-    //   add_client(chatroom_id, chatrooms);
-    //   for (int i=0; i<NUM_CHATROOMS*NUM_USERS; i++){
-    //       printf("%d ", chatrooms[i]);
-    //   }
-    // }
-    process(buffer);
-    write(client_socket, buffer, sizeof(buffer));
-    //
-    // sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
-    // printf("info in buffer: %s", buffer);
-    // write(client_socket, buffer, sizeof(buffer));
+    // if "join <chat> is typed"
+    if (! strncmp("join", buffer, 4) ){
+      printf("NEEDS TO JOIN A NEW SERVER!!!\n");
+      char * ans = buffer + 5;
+      memcpy( buffer, buffer + 5, 5 * sizeof(char));
+      printf("BUFFER: %s\n", buffer);
+      printf("ANS: %s\n", ans);
+      printf("%d\n", getpid());
+      printf("subserver %d wants to connect to chatroom: %s\n", getpid(), buffer);
+      int chatroom_id = num_from_string(*buffer);
+      printf("chatroom_id: %d\n", chatroom_id);
+      // adding the client to chatroom and the main server's lists of clients in chats
+      add_client(chatroom_id, chatrooms);
+      for (int i=0; i<NUM_CHATROOMS*NUM_USERS; i++){
+          printf("%d ", chatrooms[i]);
+      }
+
+      // notification to say you have joined
+      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+      printf("info in buffer: %s\n", buffer);
+      write(client_socket, buffer, sizeof(buffer));
+    }
+    else {
+      process(buffer);
+      write(client_socket, buffer, sizeof(buffer));
+    }
   }//end read loop
 
   shmdt(chatrooms);
