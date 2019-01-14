@@ -1,13 +1,33 @@
 #include "networking.h"
 
-void process(char *s);
-void subserver(int from_client, int * chatrooms);
+void process(char *s, char *chat_history);
+void subserver(int from_client, int * chatrooms, char * chat_history_0);
 int is_full(int * chatroom);
 int add_client(int chatroom_id, int * chatrooms);
 int num_from_string(char s);
+char * create_chat_history(char * str, int size);
+
+char * chat_shared_mem(char id, int size){
+  key_t key = ftok("forking_server.c", id);
+  printf("key: %d\n", key);
+
+  // gets id
+  int shmid = shmget(key, size, 0666|IPC_CREAT);
+  printf("id: %d\n", shmid);
+
+  // attach to shared memory
+  char * chat_history = shmat(shmid, 0, 0);
+  if(chat_history == (void*) -1){
+    perror("shmat");
+  }
+  return chat_history;
+}
 
 int main() {
-// generates key
+
+  char * chat_history_0 = chat_shared_mem('a', 1000); 
+
+  // generates key
   key_t key = ftok("networking.h", 'A');
   printf("key: %d\n", key);
 
@@ -37,17 +57,16 @@ int main() {
   listen_socket = server_setup();
 
   while (1) {
-
     int client_socket = server_connect(listen_socket);
     f = fork();
     if (f == 0)
-      subserver(client_socket, chatrooms);
+      subserver(client_socket, chatrooms, chat_history_0);
     else
       close(client_socket);
   }
 }
 
-void subserver(int client_socket, int * chatrooms) {
+void subserver(int client_socket, int * chatrooms, char * chat_history_0) {
   char buffer[BUFFER_SIZE];
 
   //code to add to chatroom
@@ -94,8 +113,8 @@ void subserver(int client_socket, int * chatrooms) {
       write(client_socket, buffer, sizeof(buffer));
     }
     else {
-      process(buffer);
-      write(client_socket, buffer, sizeof(buffer));
+      process(buffer, chat_history_0);
+      write(client_socket, chat_history_0, sizeof(buffer));
     }
   }//end read loop
 
@@ -108,14 +127,8 @@ void checker(int pid, int chatName, int * chatrooms){
 
 }
 
-void process(char * s) {
-  while (*s) {
-    if (*s >= 'a' && *s <= 'z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    else  if (*s >= 'A' && *s <= 'Z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    s++;
-  }
+void process(char * s, char * chat_history) {
+  strcat(chat_history, s);
 }
 
 int num_from_string(char s){

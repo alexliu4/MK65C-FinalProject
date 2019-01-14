@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 
 
   // code to first enter a room
+  printf("\033[H\033[J");
   printf("which chatroom would you like to connect to?\n");
   printf("Please enter a valid chatroom id (0, 1, 2): ");
   fgets(buffer, sizeof(buffer), stdin);
