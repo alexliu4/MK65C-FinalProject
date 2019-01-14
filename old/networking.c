@@ -1,5 +1,6 @@
 #include "networking.h"
 
+
 void error_check( int i, char *s ) {
   if ( i < 0 ) {
     printf("[%s] error %d: %s\n", s, errno, strerror(errno) );
@@ -23,9 +24,6 @@ int server_setup() {
   sd = socket( AF_INET, SOCK_STREAM, 0 );
   error_check( sd, "server socket" );
   printf("[server] socket created\n");
-
-  int opt = 1;
-  setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt));
 
   //setup structs for getaddrinfo
   struct addrinfo * hints, * results;
