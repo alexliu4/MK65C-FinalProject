@@ -6,7 +6,7 @@ int num_from_string(char s);
 int add_client(int chatroom_id, int * chatrooms, int client_socket);
 int get_chat_from_client(int * chatroom, int client);
 int remove_client(int * chatrooms, int client_socket);
-int create_chat(int * chatrooms, int client_socket);
+int * create_chat(int * chatrooms, int client_socket);
 int list_chat(int * chatrooms, int client_socket);
 
 // int totChat = (int) malloc(sizeof(int));
@@ -245,15 +245,32 @@ int remove_client(int * chatrooms, int client_socket){
   return slot;
 }
 
-int create_chat(int * chatrooms, int client_socket){
+// If a user wishes to create their own chat
+int * create_chat(int * chatrooms, int client_socket){
   printf("ORIGINAL: %d\n", totChat);
   totChat++;
   printf("NEW: %d\n", totChat);
-  int clients[totClients];
-  for(int i = 0; i < totClients; i++){
+  int * clients = (int *)malloc(sizeof(int)*totChat*totClients);
+  for (int i = 0; i < totChat * totClients; i++){
     clients[i] = chatrooms[i];
   }
+  add_client(totChat, clients, client_socket);
+  return clients;
+}
 
+// Checks if a chatroom is full
+int full(int chatroom, int * chatrooms, int client_socket){
+  int slot = chatroom * totClients;
+  int i = 0;
+  while (i < totClients && !chatrooms[slot]){
+    i++;
+    slot++;
+  }
+  if (i < totClients){
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 
