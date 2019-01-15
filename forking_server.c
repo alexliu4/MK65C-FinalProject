@@ -299,7 +299,7 @@ int * create_chat(int * chatrooms, int client_socket){
 int full(int chatroom, int * chatrooms, int client_socket){
   int slot = chatroom * totClients;
   int i = 0;
-  while (i < totClients && !chatrooms[slot]){
+  while (i < totClients && chatrooms[slot]){
     i++;
     slot++;
   }
