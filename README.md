@@ -1,5 +1,11 @@
 # MKS65C-FinalProject: Chatrooms
-Chatrooms with multiple chatrooms and clients!
+Chatroom application with multiple chatrooms and clients!
+# Features
+* Server-client communication
+* Usernames
+* Broadcast messages to all clients
+* Distinguish between different chatrooms
+* Switch between different chatrooms
 # Instructions
 1. Clone this repository.
 ```
@@ -27,9 +33,5 @@ make
 ```
 ~join <valid_chatroom_number>
 ```
-# Features
-* Server-client communication
-* Broadcast messages to all clients
-* Distinguish between different chatrooms
-* Switch between different chatrooms
-# Development Log
+# Bugs
+* Chatroom storage is limited (may eventually break).
