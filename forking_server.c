@@ -9,7 +9,7 @@ int remove_client(int * chatrooms, int client_socket);
 
 
 /*
-char * chat_shared_mem(char id, int size){
+  char * chat_shared_mem(char id, int size){
   key_t key = ftok("forking_server.c", id);
   printf("key: %d\n", key);
 
@@ -20,11 +20,11 @@ char * chat_shared_mem(char id, int size){
   // attach to shared memory
   char * chat_history = shmat(shmid, 0, 0);
   if(chat_history == (void*) -1){
-    perror("shmat");
+  perror("shmat");
   }
   //shmctl(shmid, IPC_RMID, NULL);
   return chat_history;
-}
+  }
 */
 int main() {
   key_t key = 123;
@@ -75,13 +75,13 @@ int main() {
     //select will block until either fd is ready
     select(listen_socket_1 + 1, &read_fds, NULL, NULL, NULL);
 
-   //if listen_socket triggered select
+    //if listen_socket triggered select
     if (FD_ISSET(listen_socket, &read_fds)){
       // client socket <- the special id to read and write to client
       if((client = server_connect(listen_socket))){
 	for(int i = 0; i < NUM_CLIENTS && clients[i]!=client; i++){
 	  if(!clients[i]){
-      // client socket id is stored in clients array
+	    // client socket id is stored in clients array
 	    clients[i] = client;
 	    i = NUM_CLIENTS; // stop the loop
 	  }
@@ -109,38 +109,38 @@ int main() {
 	if(read(clients[i], buffer, sizeof(buffer))>0){
 	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, get_chat_from_client(chatrooms, clients[i]));
 
-    // joining chatrooms
-    char * tempbuff;
-    if ( (tempbuff = strchr(buffer, '~')) ){
-      if (! strncmp("~join", tempbuff, 5) ){
-        // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
-        memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
-        printf("BUFFER: %s\n", tempbuff);
-        // printf("PID: %d\n", getpid());
-        printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
-        int chatroom_id = num_from_string(*tempbuff);
-        printf("chatroom_id: %d\n", chatroom_id);
-        // adding the client to chatroom and the main server's lists of clients in chats
-        remove_client(chatrooms, clients[i]);
-        add_client(chatroom_id, chatrooms, clients[i]);
-        for (int i=0; i < NUM_CHATS * NUM_CLIENTS; i++){
-          printf("%d ", chatrooms[i]);
-        }
+	  // joining chatrooms
+	  char * tempbuff;
+	  if ( (tempbuff = strchr(buffer, '~')) ){
+	    if (! strncmp("~join", tempbuff, 5) ){
+	      // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
+	      memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
+	      printf("BUFFER: %s\n", tempbuff);
+	      // printf("PID: %d\n", getpid());
+	      printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
+	      int chatroom_id = num_from_string(*tempbuff);
+	      printf("chatroom_id: %d\n", chatroom_id);
+	      // adding the client to chatroom and the main server's lists of clients in chats
+	      remove_client(chatrooms, clients[i]);
+	      add_client(chatroom_id, chatrooms, clients[i]);
+	      for (int i=0; i < NUM_CHATS * NUM_CLIENTS; i++){
+		printf("%d ", chatrooms[i]);
+	      }
 
-        // notification to say you have joined
-        sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
-        printf("info in buffer: %s\n", buffer);
-        write(clients[i], buffer, sizeof(buffer));
-      }
-    }
-    else {
-      // normal portion otherwise
-      //int chat = get_chat_from_client(chatrooms, client
-      strcat(chat_history, buffer);
-      for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
-        write(clients[i], chat_history, sizeof(buffer));
-     }
-    }
+	      // notification to say you have joined
+	      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+	      printf("info in buffer: %s\n", buffer);
+	      write(clients[i], buffer, sizeof(buffer));
+	    }
+	  }
+	  else {
+	    // normal portion otherwise
+	    //int chat = get_chat_from_client(chatrooms, client
+	    strcat(chat_history, buffer);
+	    for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
+	      write(clients[i], chat_history, sizeof(buffer));
+	    }
+	  }
 	}
 	else{
 	  close(clients[i]);
@@ -207,15 +207,3 @@ int remove_client(int * chatrooms, int client_socket){
   return slot;
 }
 
-// void subserver(int client_socket) {
-//   char buffer[BUFFER_SIZE];
-//
-//   while (read(client_socket, buffer, sizeof(buffer))) {
-//
-//     printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-//     process(buffer);
-//     write(client_socket, buffer, sizeof(buffer));
-//   }//end read loop
-//   close(client_socket);
-//   exit(0);
-// }
