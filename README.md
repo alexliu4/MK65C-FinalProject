@@ -10,7 +10,7 @@ Chatroom application with multiple chatrooms and clients!
 # Instructions
 1. Clone this repository.
 ```
-git clone https://github.com/JasonLin43212/Flippy-Four.git
+git clone https://github.com/alexliu4/MKS65C-FinalProject.git
 ```
 2. Go inside this repository.
 ```
@@ -36,3 +36,5 @@ make
 ```
 # Bugs
 * Chatroom storage is limited (may eventually break).
+  * If time allows, use a circular array resolve this bug.
+* After entering their username, the client must type something to receive further instruction.
