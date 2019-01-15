@@ -7,7 +7,8 @@ int add_client(int chatroom_id, int * chatrooms, int client_socket);
 int get_chat_from_client(int * chatroom, int client);
 int remove_client(int * chatrooms, int client_socket);
 int * create_chat(int * chatrooms, int client_socket);
-int list_chat(int * chatrooms, int client_socket);
+int full(int chatroom, int * chatrooms, int client_socket);
+void list_chat(int * chatrooms, int client_socket);
 
 // int totChat = (int) malloc(sizeof(int));
 // int totClients = (int) malloc(sizeof(int));
@@ -124,7 +125,7 @@ int main() {
       chatrooms[i] = 0;
     }*/
     //read from clients
-    for (int i = 0; i<totClients && clients[i]; i++){
+    for (int i = 0; i < totClients && clients[i]; i++){
       if(FD_ISSET(clients[i], &read_fds)){
 	if(read(clients[i], buffer, sizeof(buffer))>0){
   	  int chat = get_chat_from_client(chatrooms, clients[i]);
@@ -140,32 +141,41 @@ int main() {
 	      // printf("PID: %d\n", getpid());
 	      printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
 	      int chatroom_id = num_from_string(*tempbuff);
-	      printf("chatroom_id: %d\n", chatroom_id);
-	      // adding the client to chatroom and the main server's lists of clients in chats
-	      remove_client(chatrooms, clients[i]);
-	      add_client(chatroom_id, chatrooms, clients[i]);
-	      for (int i=0; i < totChat * totClients; i++){
-		printf("%d ", chatrooms[i]);
-	      }
+        
+        // checks capacity
+        if (full(chatroom_id, chatrooms, clients[i])){
+          // notification to say you cannot join
+  	      sprintf(buffer, "Chatroom %d is full. You cannot join :(\n", chatroom_id);
+  	      printf("info in buffer: %s\n", buffer);
+  	      write(clients[i], buffer, sizeof(buffer));
 
-	      // notification to say you have joined
-	      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
-	      printf("info in buffer: %s\n", buffer);
-	      write(clients[i], buffer, sizeof(buffer));
+        } else {
+          printf("chatroom_id: %d\n", chatroom_id);
+  	      // adding the client to chatroom and the main server's lists of clients in chats
+  	      remove_client(chatrooms, clients[i]);
+  	      add_client(chatroom_id, chatrooms, clients[i]);
+  	      for (int i=0; i < totChat * totClients; i++){
+  		        printf("%d ", chatrooms[i]);
+  	      }
+
+  	      // notification to say you have joined
+  	      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+  	      printf("info in buffer: %s\n", buffer);
+  	      write(clients[i], buffer, sizeof(buffer));
+        }
 	    }
 	  }
 	  else {
 	    // normal portion otherwise
 	    //int chat = get_chat_from_client(chatrooms, client
 	    strcat(chat_hist[chat], buffer);
-	    for (int i = 0; i<totChat; i++){
-    	      printf("chat_hist[%d]:\n %s", i, chat_hist[i]);
-  	    }
-
-	    for (int i = 0; i<totClients && clients[i]; i++){
+	    // for (int i = 0; i<totChat; i++){
+    	//       printf("chat_hist[%d]:\n %s", i, chat_hist[i]);
+  	  //   }
+	    for (int i = 0; i < totClients && clients[i]; i++){
 	      int this_chat = get_chat_from_client(chatrooms, clients[i]);
-	      printf("this client: %d\n", clients[i]);
-	      printf("this chat: %d\n", this_chat);
+	      // printf("this client: %d\n", clients[i]);
+	      // printf("this chat: %d\n", this_chat);
 	      if(this_chat == chat){
 	        write(clients[i], chat_hist[chat], sizeof(buffer));
 	      }
@@ -190,17 +200,17 @@ int num_from_string(char s){
 int get_chat_from_client(int * chatrooms, int client){
   int i = 0;
   for (int i = 0; i <  totClients * totChat; i++){
-    printf("inside function: %d \n", chatrooms[i]);
+    // printf("inside function: %d \n", chatrooms[i]);
   }
   while(i < totClients * totChat){
     //printf("client: %d, chatrooms[%d]: %d\n", client, i, chatrooms[i]);
-    if(chatrooms[i]==client){
-      printf("the chat of client %d is %d\n", client, i/totClients);
-      return i/totClients;
+    if(chatrooms[i] == client){
+      // printf("the chat of client %d is %d\n", client, i/totClients);
+      return i / totClients;
     }
     i++;
   }
-  printf("the chat of client %d is %d\n", client, -1);
+  // printf("the chat of client %d is %d\n", client, -1);
   return -1;
 }
 
@@ -250,7 +260,7 @@ int * create_chat(int * chatrooms, int client_socket){
   printf("ORIGINAL: %d\n", totChat);
   totChat++;
   printf("NEW: %d\n", totChat);
-  int * clients = (int *)malloc(sizeof(int)*totChat*totClients);
+  int * clients = (int *)malloc(sizeof(int) * totChat * totClients);
   for (int i = 0; i < totChat * totClients; i++){
     clients[i] = chatrooms[i];
   }
@@ -267,18 +277,18 @@ int full(int chatroom, int * chatrooms, int client_socket){
     slot++;
   }
   if (i < totClients){
-    return 1;
-  } else {
     return 0;
+  } else {
+    return 1;
   }
 }
 
-
-int list_chat(int * chatrooms, int client_socket){
+// lists all the chats
+void list_chat(int * chatrooms, int client_socket){
+  for (int i = 0; i < totChat; i++){
+    printf("=====\nCHAT %d\n=====\n", i);
+  }
 }
-
-
-
 
 // void subserver(int client_socket) {
 //   char buffer[BUFFER_SIZE];
