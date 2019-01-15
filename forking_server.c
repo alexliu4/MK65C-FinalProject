@@ -24,6 +24,18 @@ char * chat_shared_mem(char id, int size){
 }
 */
 int main() {
+    key_t key = 123;
+  int shmid = shmget(key, 100000 * NUM_CHATS, IPC_CREAT|0666);
+  char (*chat_hist)[5][100000];
+  chat_hist = shmat(shmid, 0, 0);
+  for (int i = 0; i<NUM_CHATS; i++){
+    char title[100];
+    sprintf(title, "=====\nCHAT %d\n=====\n", i);
+    strcpy((*chat_hist)[i], title);
+  }
+  for (int i = 0; i<NUM_CHATS; i++){
+    //printf("chat_hist[%d]: %s", i, (*chat_hist)[i]);
+  }
 
   //char * chat_history = chat_shared_mem('a', 1000000000)
   //memset(chat_history, 0, sizeof(chat_history));
