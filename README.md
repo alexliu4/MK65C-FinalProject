@@ -6,7 +6,6 @@ Chatroom application with multiple chatrooms and clients!
 * Broadcast messages to all clients
 * Distinguish between different chatrooms
 * Switch between different chatrooms
-* Create chatrooms
 # Instructions
 1. Clone this repository.
 ```

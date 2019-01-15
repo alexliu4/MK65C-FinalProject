@@ -168,8 +168,10 @@ int main() {
         }
 	    }
       /* ==========================================DONE JOIN COMMAND========================================== */
-         
+
+
       /* ==========================================CREATE COMMAND========================================== */
+      /*
       if (! strncmp("~create", tempbuff, 7) ){
         memcpy(tempbuff, tempbuff + 7, 7 * sizeof(char));
         printf("BUFFER: %s\n", tempbuff);
@@ -190,15 +192,18 @@ int main() {
         printf("info in buffer: %s\n", buffer);
         write(clients[i], buffer, sizeof(buffer));
       }
+      */
       /* ==========================================DONE CREATE COMMAND========================================== */
 
       /* ==========================================CREATE COMMAND========================================== */
+      /*
       if (! strncmp("~list", tempbuff, 5) ){
 
         printf("subserver %d wants to see all chatrooms\n", getpid());
         list_chat(chatrooms, clients[i]);
-
       }
+      */
+
 	  }
 	 else if (chat == -1){
          char join_message[150];
@@ -339,10 +344,10 @@ int full(int chatroom, int * chatrooms, int client_socket){
 
 // lists all the chats
 void list_chat(int * chatrooms, int client_socket){
-  char * buffer = NULL;
+  char * buflist = (char *)malloc(sizeof(char *)* 20);
   for (int i = 0; i < totChat; i++){
-    sprintf(buffer, "=====\nCHAT %d\n=====\n", i);
-    printf("info in buffer: %s\n", buffer);
-    write(client_socket, buffer, sizeof(buffer));
+    sprintf(buflist, "=====\nCHAT %d\n=====\n", i);
+    printf("info in buffer: \n%s", buflist);
   }
+  write(client_socket, buflist, sizeof(buflist));
 }
