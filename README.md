@@ -38,3 +38,4 @@ make
 * Chatroom storage is limited (may eventually break).
   * If time allows, use a circular array resolve this bug.
 * After entering their username, the client must type something to receive further instruction.
+  * (i.e. hit enter twice)
