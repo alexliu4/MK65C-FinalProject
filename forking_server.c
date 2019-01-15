@@ -125,7 +125,7 @@ int main() {
 	  // joining chatrooms
 	  char * tempbuff;
 	  if ( (tempbuff = strchr(buffer, '~')) ){
-	    if (! strncmp("~join", tempbuff, 5) ){
+	    if (! strncmp("~join ", tempbuff, 6) ){
 	      // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
 	      memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
 	      printf("BUFFER: %s\n", tempbuff);
