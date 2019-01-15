@@ -89,7 +89,7 @@ int main() {
       }
     }
 
-    // generates key
+    /*// generates key
     key_t key = ftok("networking.h", 'A');
     printf("key: %d\n", key);
 
@@ -101,8 +101,11 @@ int main() {
     int * chatrooms = shmat(shmid, 0, 0);
     if(chatrooms == (void*) -1){
       perror("shmat");
+    }*/
+    int chatrooms[NUM_CHATS*NUM_CLIENTS];
+    for (int i = 0; i < NUM_CHATS*NUM_CLIENTS; i++){
+      chatrooms[i] = 0;
     }
-
     //read from clients
     for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
       if(FD_ISSET(clients[i], &read_fds)){
