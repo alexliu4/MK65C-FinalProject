@@ -114,10 +114,8 @@ int main() {
     if ( (tempbuff = strchr(buffer, '~')) ){
       if (! strncmp("~join", tempbuff, 5) ){
         // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
-        // char * ans = tempbuff + 6;
         memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
         printf("BUFFER: %s\n", tempbuff);
-        // printf("ANS: %s\n", ans);
         // printf("PID: %d\n", getpid());
         printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
         int chatroom_id = num_from_string(*tempbuff);
@@ -164,12 +162,11 @@ int get_chat_from_client(int * chatroom, int client){
   while(i < NUM_CLIENTS * NUM_CHATS && chatroom[i]!=client){
     i++;
   }
-  int chat = i/NUM_CLIENTS;
-  return chat; 
+  int chat = i / NUM_CLIENTS;
+  return chat;
 }
 
 
-// chatroom number to enter; array of users in chatrooms; pid()
 // chatroom number to enter; array of users in chatrooms; special client socket code to read and write
 int add_client(int chatroom, int * chatrooms, int client_socket){
   int slot = chatroom;
