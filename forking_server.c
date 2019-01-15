@@ -15,7 +15,7 @@ int totChat = NUM_CHATS;
 int totClients = NUM_CLIENTS;
 
 /*
-char * chat_shared_mem(char id, int size){
+  char * chat_shared_mem(char id, int size){
   key_t key = ftok("forking_server.c", id);
   printf("key: %d\n", key);
 
@@ -26,24 +26,33 @@ char * chat_shared_mem(char id, int size){
   // attach to shared memory
   char * chat_history = shmat(shmid, 0, 0);
   if(chat_history == (void*) -1){
-    perror("shmat");
+  perror("shmat");
   }
   //shmctl(shmid, IPC_RMID, NULL);
   return chat_history;
-}
+  }
 */
 
 
 int main() {
-  key_t key = 123;
+  /*key_t key = 123;
   int shmid = shmget(key, 100000 * totChat, IPC_CREAT|0666);
   char (*chat_hist)[5][100000];
   chat_hist = shmat(shmid, 0, 0);
+*/
+  int chatrooms[totChat * totClients];
+  for (int i = 0; i < totChat * totClients; i++){
+    chatrooms[i] = 0;
+  }
+
+
+  char chat_hist[5][100000];
   for (int i = 0; i < totChat; i++){
     char title[100];
     sprintf(title, "=====\nCHAT %d\n=====\n", i);
-    strcpy((*chat_hist)[i], title);
+    strcpy(chat_hist[i], title);
   }
+
   for (int i = 0; i < totChat; i++){
     //printf("chat_hist[%d]: %s", i, (*chat_hist)[i]);
   }
@@ -51,7 +60,7 @@ int main() {
   //char * chat_history = chat_shared_mem('a', 1000000000)
   //memset(chat_history, 0, sizeof(chat_history));
 
-  char * chat_history = calloc(100000, sizeof(char));
+//  char * chat_history = calloc(100000, sizeof(char));
 
   int listen_socket;
   int listen_socket_1;
@@ -83,13 +92,13 @@ int main() {
     //select will block until either fd is ready
     select(listen_socket_1 + 1, &read_fds, NULL, NULL, NULL);
 
-   //if listen_socket triggered select
+    //if listen_socket triggered select
     if (FD_ISSET(listen_socket, &read_fds)){
       // client socket <- the special id to read and write to client
       if((client = server_connect(listen_socket))){
 	for(int i = 0; i < totClients && clients[i]!=client; i++){
 	  if(!clients[i]){
-      // client socket id is stored in clients array
+	    // client socket id is stored in clients array
 	    clients[i] = client;
 	    i = totClients; // stop the loop
 	  }
@@ -97,7 +106,7 @@ int main() {
       }
     }
 
-    // generates key
+    /*// generates key
     key_t key = ftok("networking.h", 'A');
     printf("key: %d\n", key);
 
@@ -109,46 +118,59 @@ int main() {
     int * chatrooms = shmat(shmid, 0, 0);
     if(chatrooms == (void*) -1){
       perror("shmat");
-    }
-
+    }*/
+    /*int chatrooms[totChat*totClients];
+    for (int i = 0; i < totChat*totClients; i++){
+      chatrooms[i] = 0;
+    }*/
     //read from clients
     for (int i = 0; i<totClients && clients[i]; i++){
       if(FD_ISSET(clients[i], &read_fds)){
 	if(read(clients[i], buffer, sizeof(buffer))>0){
-	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, get_chat_from_client(chatrooms, clients[i]));
+  	  int chat = get_chat_from_client(chatrooms, clients[i]);
+	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, chat);
 
-    // joining chatrooms
-    char * tempbuff;
-    if ( (tempbuff = strchr(buffer, '~')) ){
-      if (! strncmp("~join", tempbuff, 5) ){
-        // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
-        memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
-        printf("BUFFER: %s\n", tempbuff);
-        // printf("PID: %d\n", getpid());
-        printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
-        int chatroom_id = num_from_string(*tempbuff);
-        printf("chatroom_id: %d\n", chatroom_id);
-        // adding the client to chatroom and the main server's lists of clients in chats
-        remove_client(chatrooms, clients[i]);
-        add_client(chatroom_id, chatrooms, clients[i]);
-        for (int i=0; i < totChat * totClients; i++){
-          printf("%d ", chatrooms[i]);
-        }
+	  // joining chatrooms
+	  char * tempbuff;
+	  if ( (tempbuff = strchr(buffer, '~')) ){
+	    if (! strncmp("~join ", tempbuff, 6) ){
+	      // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
+	      memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
+	      printf("BUFFER: %s\n", tempbuff);
+	      // printf("PID: %d\n", getpid());
+	      printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
+	      int chatroom_id = num_from_string(*tempbuff);
+	      printf("chatroom_id: %d\n", chatroom_id);
+	      // adding the client to chatroom and the main server's lists of clients in chats
+	      remove_client(chatrooms, clients[i]);
+	      add_client(chatroom_id, chatrooms, clients[i]);
+	      for (int i=0; i < totChat * totClients; i++){
+		printf("%d ", chatrooms[i]);
+	      }
 
-        // notification to say you have joined
-        sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
-        printf("info in buffer: %s\n", buffer);
-        write(clients[i], buffer, sizeof(buffer));
-      }
-    }
-    else {
-      // normal portion otherwise
-      //int chat = get_chat_from_client(chatrooms, client
-      strcat(chat_history, buffer);
-      for (int i = 0; i<totClients && clients[i]; i++){
-        write(clients[i], chat_history, sizeof(buffer));
-     }
-    }
+	      // notification to say you have joined
+	      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+	      printf("info in buffer: %s\n", buffer);
+	      write(clients[i], buffer, sizeof(buffer));
+	    }
+	  }
+	  else {
+	    // normal portion otherwise
+	    //int chat = get_chat_from_client(chatrooms, client
+	    strcat(chat_hist[chat], buffer);
+	    for (int i = 0; i<totChat; i++){
+    	      printf("chat_hist[%d]:\n %s", i, chat_hist[i]);
+  	    }
+
+	    for (int i = 0; i<totClients && clients[i]; i++){
+	      int this_chat = get_chat_from_client(chatrooms, clients[i]);
+	      printf("this client: %d\n", clients[i]);
+	      printf("this chat: %d\n", this_chat);
+	      if(this_chat == chat){
+	        write(clients[i], chat_hist[chat], sizeof(buffer));
+	      }
+	    }
+	  }
 	}
 	else{
 	  close(clients[i]);
@@ -165,13 +187,21 @@ int num_from_string(char s){
   return num;
 }
 
-int get_chat_from_client(int * chatroom, int client){
+int get_chat_from_client(int * chatrooms, int client){
   int i = 0;
-  while(i < totClients * totChat && chatroom[i]!=client){
+  for (int i = 0; i <  totClients * totChat; i++){
+    printf("inside function: %d \n", chatrooms[i]);
+  }
+  while(i < totClients * totChat){
+    //printf("client: %d, chatrooms[%d]: %d\n", client, i, chatrooms[i]);
+    if(chatrooms[i]==client){
+      printf("the chat of client %d is %d\n", client, i/totClients);
+      return i/totClients;
+    }
     i++;
   }
-  int chat = i / totClients;
-  return chat;
+  printf("the chat of client %d is %d\n", client, -1);
+  return -1;
 }
 
 
