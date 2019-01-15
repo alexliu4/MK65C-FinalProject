@@ -168,7 +168,7 @@ int main() {
         }
 	    }
       /* ==========================================DONE JOIN COMMAND========================================== */
-
+         
       /* ==========================================CREATE COMMAND========================================== */
       if (! strncmp("~create", tempbuff, 7) ){
         memcpy(tempbuff, tempbuff + 7, 7 * sizeof(char));
@@ -200,6 +200,12 @@ int main() {
 
       }
 	  }
+	 else if (chat == -1){
+         char join_message[150];
+         sprintf(join_message, "Please enter a valid chatroom in the following format:\n~join <chat>\n where chat is a number from 0 to %d", NUM_CHATS-1);
+         write(clients[i], join_message, sizeof(join_message));
+         }
+
 	  else {
 	    // normal portion otherwise
 	    //int chat = get_chat_from_client(chatrooms, client

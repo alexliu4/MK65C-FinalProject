@@ -6,10 +6,11 @@ Chatroom application with multiple chatrooms and clients!
 * Broadcast messages to all clients
 * Distinguish between different chatrooms
 * Switch between different chatrooms
+* Create chatrooms
 # Instructions
 1. Clone this repository.
 ```
-git clone https://github.com/JasonLin43212/Flippy-Four.git
+git clone https://github.com/alexliu4/MKS65C-FinalProject.git
 ```
 2. Go inside this repository.
 ```
@@ -28,10 +29,12 @@ make
 ./client <server_name>
 ```
 6. Enter your username as prompted.
-7. You have now been added to a random chat room! Get typing!
+7. Join a chatroom as prompted.
 8. To change chatrooms, type the following:
 ```
 ~join <valid_chatroom_number>
 ```
 # Bugs
 * Chatroom storage is limited (may eventually break).
+  * If time allows, use a circular array resolve this bug.
+* After entering their username, the client must type something to receive further instruction.
