@@ -1,4 +1,5 @@
-# MKS65C-FinalProject: Chatrooms
+# MKS65C-FinalProject: C-hat
+### Alex Liu and Karen Li
 Chatroom application with multiple chatrooms and clients!
 # Features
 * Server-client communication
