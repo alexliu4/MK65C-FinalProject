@@ -133,7 +133,10 @@ int main() {
 
 	  // joining chatrooms
 	  char * tempbuff;
+    // special commands
 	  if ( (tempbuff = strchr(buffer, '~')) ){
+
+      /* ==========================================JOIN COMMAND========================================== */
 	    if (! strncmp("~join ", tempbuff, 6) ){
 	      // printf("NEEDS TO JOIN A NEW SERVER!!!\n");
 	      memcpy(tempbuff, tempbuff + 6, 6 * sizeof(char));
@@ -141,7 +144,7 @@ int main() {
 	      // printf("PID: %d\n", getpid());
 	      printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
 	      int chatroom_id = num_from_string(*tempbuff);
-        
+
         // checks capacity
         if (full(chatroom_id, chatrooms, clients[i])){
           // notification to say you cannot join
@@ -164,6 +167,39 @@ int main() {
   	      write(clients[i], buffer, sizeof(buffer));
         }
 	    }
+      /* ==========================================DONE JOIN COMMAND========================================== */
+
+      /* ==========================================CREATE COMMAND========================================== */
+      if (! strncmp("~create ", tempbuff, 8) ){
+	    //   memcpy(tempbuff, tempbuff + 8, 8 * sizeof(char));
+	    //   printf("BUFFER: %s\n", tempbuff);
+	    //   // printf("PID: %d\n", getpid());
+	    //   printf("subserver %d wants to connect to chatroom: %s\n", getpid(), tempbuff);
+	    //   int chatroom_id = num_from_string(*tempbuff);
+      //
+      //   // checks capacity
+      //   if (full(chatroom_id, chatrooms, clients[i])){
+      //     // notification to say you cannot join
+  	  //     sprintf(buffer, "Chatroom %d is full. You cannot join :(\n", chatroom_id);
+  	  //     printf("info in buffer: %s\n", buffer);
+  	  //     write(clients[i], buffer, sizeof(buffer));
+      //
+      //   } else {
+      //     printf("chatroom_id: %d\n", chatroom_id);
+  	  //     // adding the client to chatroom and the main server's lists of clients in chats
+  	  //     remove_client(chatrooms, clients[i]);
+  	  //     add_client(chatroom_id, chatrooms, clients[i]);
+  	  //     for (int i=0; i < totChat * totClients; i++){
+  		//         printf("%d ", chatrooms[i]);
+  	  //     }
+      //
+  	  //     // notification to say you have joined
+  	  //     sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+  	  //     printf("info in buffer: %s\n", buffer);
+  	  //     write(clients[i], buffer, sizeof(buffer));
+      //   }
+	    // }
+
 	  }
 	  else {
 	    // normal portion otherwise
