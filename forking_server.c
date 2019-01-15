@@ -162,7 +162,7 @@ int main() {
   	      }
 
   	      // notification to say you have joined
-  	      sprintf(buffer, "you have joined chatroom %d\n", chatroom_id);
+  	      sprintf(buffer, "You have joined chatroom %d. Send a message to see the chat!\n ", chatroom_id);
   	      printf("info in buffer: %s\n", buffer);
   	      write(clients[i], buffer, sizeof(buffer));
         }

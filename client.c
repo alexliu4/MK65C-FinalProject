@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
   char username[BUFFER_SIZE];
   printf("\033[H\033[J");
   // system("cls");
-  printf("Enter your username: ");
+  printf("Enter your username and press [enter] twice: ");
   fgets(username, BUFFER_SIZE, stdin);
   *strchr(username, '\n') = 0;
   strcat(username,": ");
