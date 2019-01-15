@@ -4,6 +4,7 @@ void process(char *s);
 void subserver(int from_client);
 int num_from_string(char s);
 int add_client(int chatroom_id, int * chatrooms, int client_socket);
+int get_chat_from_client(int * chatroom, int client);
 
 /*
 char * chat_shared_mem(char id, int size){
@@ -24,7 +25,7 @@ char * chat_shared_mem(char id, int size){
 }
 */
 int main() {
-    key_t key = 123;
+  key_t key = 123;
   int shmid = shmget(key, 100000 * NUM_CHATS, IPC_CREAT|0666);
   char (*chat_hist)[5][100000];
   chat_hist = shmat(shmid, 0, 0);
@@ -100,12 +101,13 @@ int main() {
       perror("shmat");
     }
 
+    //read from clients
     for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
       if(FD_ISSET(clients[i], &read_fds)){
 	if(read(clients[i], buffer, sizeof(buffer))>0){
-	  printf("[subserver %d] received: %s\n", getpid(), buffer);
+	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, get_chat_from_client(chatrooms, clients[i]));
 
-    // joining part
+    // joining chatrooms
     char * tempbuff;
     if ( (tempbuff = strchr(buffer, '~')) ){
       if (! strncmp("~join", tempbuff, 5) ){
@@ -132,9 +134,10 @@ int main() {
     }
     else {
       // normal portion otherwise
+      //int chat = get_chat_from_client(chatrooms, client
       strcat(chat_history, buffer);
       for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
-      write(clients[i], chat_history, sizeof(buffer));
+        write(clients[i], chat_history, sizeof(buffer));
      }
     }
 	}
@@ -152,6 +155,16 @@ int num_from_string(char s){
   int num = s - '0';
   return num;
 }
+
+int get_chat_from_client(int * chatroom, int client){
+  int i = 0;
+  while(i < NUM_CLIENTS * NUM_CHATS && chatroom[i]!=client){
+    i++;
+  }
+  int chat = i/NUM_CLIENTS;
+  return chat; 
+}
+
 
 // chatroom number to enter; array of users in chatrooms; pid()
 int add_client(int chatroom, int * chatrooms, int client_socket){
