@@ -4,6 +4,7 @@ void process(char *s);
 void subserver(int from_client);
 int num_from_string(char s);
 int add_client(int chatroom_id, int * chatrooms, int client_socket);
+int remove_client(int * chatrooms, int client_socket);
 
 /*
 char * chat_shared_mem(char id, int size){
@@ -119,6 +120,7 @@ int main() {
         int chatroom_id = num_from_string(*tempbuff);
         printf("chatroom_id: %d\n", chatroom_id);
         // adding the client to chatroom and the main server's lists of clients in chats
+        remove_client(chatrooms, clients[i]);
         add_client(chatroom_id, chatrooms, clients[i]);
         for (int i=0; i < NUM_CHATS * NUM_CLIENTS; i++){
           printf("%d ", chatrooms[i]);
@@ -153,7 +155,7 @@ int num_from_string(char s){
   return num;
 }
 
-// chatroom number to enter; array of users in chatrooms; pid()
+// chatroom number to enter; array of users in chatrooms; special client socket code to read and write
 int add_client(int chatroom, int * chatrooms, int client_socket){
   int slot = chatroom;
   printf("chatroom: %d\n", chatroom);
@@ -164,7 +166,7 @@ int add_client(int chatroom, int * chatrooms, int client_socket){
   //   col++;
   // }
   // chatroom format 0 0 0 1 1 1 2 2 2
-  printf("%d\n", NUM_CLIENTS);
+  // printf("%d\n", NUM_CLIENTS);
   slot = chatroom * NUM_CLIENTS;
   int increment = 0;
   while(increment < NUM_CLIENTS && chatrooms[slot]){
@@ -173,6 +175,23 @@ int add_client(int chatroom, int * chatrooms, int client_socket){
   }
   printf("slot: %d\n", slot);
   chatrooms[slot] = client_socket;
+  return slot;
+}
+
+// array of users in chatrooms; special client socket code to read and write
+int remove_client(int * chatrooms, int client_socket){
+  int slot = 0;
+  // chatroom format 0 0 0 1 1 1 2 2 2
+  // printf("%d\n", NUM_CLIENTS);
+  int increment = 0;
+  while(increment < NUM_CLIENTS && chatrooms[slot] != client_socket){
+    increment++;
+    slot += increment;
+  }
+  printf("slot: %d\n", slot);
+  int chatroom = slot / NUM_CLIENTS;
+  printf("chatroom: %d\n", chatroom);
+  chatrooms[slot] = 0;
   return slot;
 }
 
