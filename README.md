@@ -28,7 +28,7 @@ make
 ./client <server_name>
 ```
 6. Enter your username as prompted.
-7. You have now been added to a random chat room! Get typing!
+7. Join a chatroom as prompted.
 8. To change chatrooms, type the following:
 ```
 ~join <valid_chatroom_number>
