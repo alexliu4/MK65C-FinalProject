@@ -27,15 +27,24 @@ int remove_client(int * chatrooms, int client_socket);
   }
 */
 int main() {
-  key_t key = 123;
+  /*key_t key = 123;
   int shmid = shmget(key, 100000 * NUM_CHATS, IPC_CREAT|0666);
   char (*chat_hist)[5][100000];
   chat_hist = shmat(shmid, 0, 0);
+*/
+  int chatrooms[NUM_CHATS*NUM_CLIENTS];
+  for (int i = 0; i < NUM_CHATS*NUM_CLIENTS; i++){
+    chatrooms[i] = 0;
+  }
+
+
+  char chat_hist[5][100000];
   for (int i = 0; i<NUM_CHATS; i++){
     char title[100];
     sprintf(title, "=====\nCHAT %d\n=====\n", i);
-    strcpy((*chat_hist)[i], title);
+    strcpy(chat_hist[i], title);
   }
+
   for (int i = 0; i<NUM_CHATS; i++){
     //printf("chat_hist[%d]: %s", i, (*chat_hist)[i]);
   }
@@ -43,7 +52,7 @@ int main() {
   //char * chat_history = chat_shared_mem('a', 1000000000)
   //memset(chat_history, 0, sizeof(chat_history));
 
-  char * chat_history = calloc(100000, sizeof(char));
+//  char * chat_history = calloc(100000, sizeof(char));
 
   int listen_socket;
   int listen_socket_1;
@@ -102,15 +111,16 @@ int main() {
     if(chatrooms == (void*) -1){
       perror("shmat");
     }*/
-    int chatrooms[NUM_CHATS*NUM_CLIENTS];
+    /*int chatrooms[NUM_CHATS*NUM_CLIENTS];
     for (int i = 0; i < NUM_CHATS*NUM_CLIENTS; i++){
       chatrooms[i] = 0;
-    }
+    }*/
     //read from clients
     for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
       if(FD_ISSET(clients[i], &read_fds)){
 	if(read(clients[i], buffer, sizeof(buffer))>0){
-	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, get_chat_from_client(chatrooms, clients[i]));
+  	  int chat = get_chat_from_client(chatrooms, clients[i]);
+	  printf("[subserver %d] received: %s from chatroom %d\n", getpid(), buffer, chat);
 
 	  // joining chatrooms
 	  char * tempbuff;
@@ -139,9 +149,18 @@ int main() {
 	  else {
 	    // normal portion otherwise
 	    //int chat = get_chat_from_client(chatrooms, client
-	    strcat(chat_history, buffer);
+	    strcat(chat_hist[chat], buffer);
+	    for (int i = 0; i<NUM_CHATS; i++){
+    	      printf("chat_hist[%d]:\n %s", i, chat_hist[i]);
+  	    }
+
 	    for (int i = 0; i<NUM_CLIENTS && clients[i]; i++){
-	      write(clients[i], chat_history, sizeof(buffer));
+	      int this_chat = get_chat_from_client(chatrooms, clients[i]);
+	      printf("this client: %d\n", clients[i]);
+	      printf("this chat: %d\n", this_chat);
+	      if(this_chat == chat){
+	        write(clients[i], chat_hist[chat], sizeof(buffer));
+	      }
 	    }
 	  }
 	}
@@ -160,13 +179,21 @@ int num_from_string(char s){
   return num;
 }
 
-int get_chat_from_client(int * chatroom, int client){
+int get_chat_from_client(int * chatrooms, int client){
   int i = 0;
-  while(i < NUM_CLIENTS * NUM_CHATS && chatroom[i]!=client){
+  for (int i = 0; i <  NUM_CLIENTS * NUM_CHATS; i++){
+    printf("inside function: %d \n", chatrooms[i]); 
+  }
+  while(i < NUM_CLIENTS * NUM_CHATS){
+    //printf("client: %d, chatrooms[%d]: %d\n", client, i, chatrooms[i]);
+    if(chatrooms[i]==client){
+      printf("the chat of client %d is %d\n", client, i/NUM_CLIENTS);
+      return i/NUM_CLIENTS;
+    }
     i++;
   }
-  int chat = i / NUM_CLIENTS;
-  return chat;
+  printf("the chat of client %d is %d\n", client, -1);
+  return -1;
 }
 
 
